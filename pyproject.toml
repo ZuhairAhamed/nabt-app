@@ -1,0 +1,87 @@
+[project]
+name = "nabt"
+version = "1.0.0"
+description = "Product Extraction and Classification System using Hybrid ML"
+readme = "README.md"
+requires-python = ">=3.12"
+authors = [
+    { name = "Your Name", email = "your.email@example.com" }
+]
+license = { text = "MIT" }
+keywords = ["product", "extraction", "classification", "ml", "llm"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+
+dependencies = [
+    "fastapi>=0.109.0",
+    "uvicorn[standard]>=0.27.0",
+    "langchain-groq>=0.1.0",
+    "langchain>=0.1.0",
+    "langchain-core>=0.1.0",
+    "pydantic>=2.0.0",
+    "pymongo>=4.6.0",
+    "python-dotenv>=1.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    "pytest-asyncio>=0.21.0",
+    "httpx>=0.24.0",
+    "black>=23.0.0",
+    "ruff>=0.1.0",
+    "mypy>=1.0.0",
+]
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --strict-markers"
+
+[tool.black]
+line-length = 100
+target-version = ['py312']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hatch
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+select = ["E", "F", "I", "N", "W"]
+ignore = ["E501"]
+src = ["src"]
+
+[tool.mypy]
+python_version = "3.12"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+mypy_path = "src"
