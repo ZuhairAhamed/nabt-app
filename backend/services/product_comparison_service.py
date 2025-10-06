@@ -71,18 +71,6 @@ class ProductComparison:
 
 
 @dataclass
-class SupplierRanking:
-    """Ranking and analysis for a supplier."""
-    supplier: str
-    products_count: int
-    best_price_count: int
-    avg_price_position: float  # 1.0 = always cheapest, 5.0 = always most expensive
-    avg_discount_pct: float
-    reliability_score: float
-    category_strengths: Dict[str, float]
-
-
-@dataclass
 class SavingsOpportunity:
     """Represents a potential cost-saving opportunity."""
     product_name: str
@@ -104,6 +92,58 @@ class PriceTrend:
     trend_direction: str  # "increasing", "decreasing", "stable"
     change_pct: float
     volatility_score: float
+
+
+def _calculate_statistics(prices: List[float]) -> PriceStatistics:
+    """Calculate statistical measures for a list of prices."""
+    if not prices:
+        return PriceStatistics(0, 0, 0, 0, 0, 0, 0)
+
+    min_price = min(prices)
+    max_price = max(prices)
+    avg_price = statistics.mean(prices)
+    median_price = statistics.median(prices)
+
+    variance_pct = ((max_price - min_price) / max_price * 100) if max_price > 0 else 0
+    std_dev = statistics.stdev(prices) if len(prices) > 1 else 0
+
+    return PriceStatistics(
+        min_price=min_price,
+        max_price=max_price,
+        avg_price=avg_price,
+        median_price=median_price,
+        variance_pct=variance_pct,
+        std_deviation=std_dev,
+        supplier_count=len(prices)
+    )
+
+
+def _get_date_filter(period: ComparisonPeriod) -> Dict:
+    """Get MongoDB date filter based on comparison period."""
+    if period == ComparisonPeriod.ALL:
+        return {}
+
+    end_date = datetime.now()
+
+    if period == ComparisonPeriod.TODAY:
+        start_date = end_date
+    elif period == ComparisonPeriod.WEEK:
+        start_date = end_date - timedelta(days=7)
+    elif period == ComparisonPeriod.MONTH:
+        start_date = end_date - timedelta(days=30)
+    elif period == ComparisonPeriod.QUARTER:
+        start_date = end_date - timedelta(days=90)
+    elif period == ComparisonPeriod.YEAR:
+        start_date = end_date - timedelta(days=365)
+    else:
+        return {}
+
+    return {
+        "date": {
+            "$gte": start_date.strftime("%Y-%m-%d"),
+            "$lte": end_date.strftime("%Y-%m-%d")
+        }
+    }
 
 
 class ProductComparisonService:
@@ -156,16 +196,8 @@ class ProductComparisonService:
     ) -> Optional[ProductComparison]:
         """
         Get price comparison for a specific product across all suppliers.
-
-        Args:
-            product_name: Name of the product to compare
-            period: Time period for comparison
-
-        Returns:
-            ProductComparison object with all supplier prices and statistics,
-            or None if product not found
         """
-        date_filter = self._get_date_filter(period)
+        date_filter = _get_date_filter(period)
 
         # Query all matching products (without unit filter)
         query = {
@@ -208,7 +240,7 @@ class ProductComparisonService:
             return None
 
         # Calculate statistics
-        stats = self._calculate_statistics(prices_only)
+        stats = _calculate_statistics(prices_only)
 
         # Find best and worst suppliers
         best_supplier = min(supplier_prices, key=lambda x: x.price)
@@ -238,230 +270,6 @@ class ProductComparisonService:
             potential_savings_pct=savings_pct,
             potential_savings_amount=savings_amount
         )
-
-    def get_all_comparisons(
-        self,
-        category: Optional[str] = None,
-        min_suppliers: int = 2,
-        period: ComparisonPeriod = ComparisonPeriod.TODAY
-    ) -> List[ProductComparison]:
-        """
-        Get price comparisons for all products with multiple suppliers.
-
-        Args:
-            category: Filter by product category (optional)
-            min_suppliers: Minimum number of suppliers required for comparison
-            period: Time period for comparison
-
-        Returns:
-            List of ProductComparison objects
-        """
-        date_filter = self._get_date_filter(period)
-
-        # Build query
-        query = date_filter.copy()
-        if category:
-            query["category"] = category
-
-        # Get all products
-        products = list(self.collection.find(query))
-
-        # Group by normalized name
-        product_groups = defaultdict(list)
-        for product in products:
-            normalized = self.normalize_product_name(
-                product.get("name", ""),
-                product.get("unit", "")
-            )
-            product_groups[normalized].append(product)
-
-        # Create comparisons for products with multiple suppliers
-        comparisons = []
-        for normalized_name, product_list in product_groups.items():
-            suppliers = set(p.get("source") for p in product_list)
-
-            if len(suppliers) >= min_suppliers:
-                # Use first product's name and unit as representative
-                first_product = product_list[0]
-                comparison = self.get_product_comparison(
-                    first_product.get("name", ""),
-                    first_product.get("unit", ""),
-                    period
-                )
-                if comparison:
-                    comparisons.append(comparison)
-
-        # Sort by potential savings (highest first)
-        comparisons.sort(key=lambda x: x.potential_savings_amount, reverse=True)
-
-        return comparisons
-
-
-    def get_price_trends(
-        self,
-        product_name: str,
-        unit: str,
-        supplier: Optional[str] = None,
-        days: int = 30
-    ) -> List[PriceTrend]:
-        """
-        Get historical price trends for a product.
-
-        Args:
-            product_name: Name of the product
-            unit: Product unit
-            supplier: Specific supplier (optional, shows all if None)
-            days: Number of days to analyze
-
-        Returns:
-            List of PriceTrend objects
-        """
-        end_date = datetime.now()
-        start_date = end_date - timedelta(days=days)
-
-        query = {
-            "name": {"$regex": product_name, "$options": "i"},
-            "unit": unit,
-            "date": {
-                "$gte": start_date.strftime("%Y-%m-%d"),
-                "$lte": end_date.strftime("%Y-%m-%d")
-            }
-        }
-
-        if supplier:
-            query["source"] = supplier
-
-        products = list(self.collection.find(query).sort("date", 1))
-
-        # Group by supplier
-        supplier_prices = defaultdict(list)
-        for product in products:
-            supplier_name = product.get("source", "Unknown")
-            date = product.get("date", "")
-            price = product.get("price", 0.0)
-            supplier_prices[supplier_name].append((date, price))
-
-        # Create trends
-        trends = []
-        for supplier_name, prices in supplier_prices.items():
-            if len(prices) < 2:
-                continue
-
-            # Calculate trend direction
-            first_price = prices[0][1]
-            last_price = prices[-1][1]
-            change_pct = ((last_price - first_price) / first_price * 100) if first_price > 0 else 0
-
-            if change_pct > 5:
-                direction = "increasing"
-            elif change_pct < -5:
-                direction = "decreasing"
-            else:
-                direction = "stable"
-
-            # Calculate volatility (standard deviation of prices)
-            price_values = [p[1] for p in prices]
-            volatility = statistics.stdev(price_values) if len(price_values) > 1 else 0
-            avg_price = statistics.mean(price_values)
-            volatility_score = (volatility / avg_price * 100) if avg_price > 0 else 0
-
-            trend = PriceTrend(
-                product_name=product_name,
-                supplier=supplier_name,
-                prices=prices,
-                trend_direction=direction,
-                change_pct=change_pct,
-                volatility_score=volatility_score
-            )
-            trends.append(trend)
-
-        return trends
-
-    def get_category_best_suppliers(
-        self,
-        period: ComparisonPeriod = ComparisonPeriod.MONTH
-    ) -> Dict[str, Dict]:
-        """
-        Get best supplier for each product category.
-
-        Args:
-            period: Time period for analysis
-
-        Returns:
-            Dictionary mapping categories to best supplier info
-        """
-        # Get all unique categories
-        categories = self.collection.distinct("category", self._get_date_filter(period))
-
-        category_leaders = {}
-
-        for category in categories:
-            if not category:
-                continue
-
-            rankings = self.get_supplier_rankings(category=category, period=period)
-
-            if rankings:
-                best_supplier = rankings[0]
-                category_leaders[category] = {
-                    "supplier": best_supplier.supplier,
-                    "products_count": best_supplier.products_count,
-                    "best_price_count": best_supplier.best_price_count,
-                    "avg_discount_pct": best_supplier.avg_discount_pct,
-                    "reliability_score": best_supplier.reliability_score
-                }
-
-        return category_leaders
-
-    def _calculate_statistics(self, prices: List[float]) -> PriceStatistics:
-        """Calculate statistical measures for a list of prices."""
-        if not prices:
-            return PriceStatistics(0, 0, 0, 0, 0, 0, 0)
-
-        min_price = min(prices)
-        max_price = max(prices)
-        avg_price = statistics.mean(prices)
-        median_price = statistics.median(prices)
-
-        variance_pct = ((max_price - min_price) / max_price * 100) if max_price > 0 else 0
-        std_dev = statistics.stdev(prices) if len(prices) > 1 else 0
-
-        return PriceStatistics(
-            min_price=min_price,
-            max_price=max_price,
-            avg_price=avg_price,
-            median_price=median_price,
-            variance_pct=variance_pct,
-            std_deviation=std_dev,
-            supplier_count=len(prices)
-        )
-
-    def _get_date_filter(self, period: ComparisonPeriod) -> Dict:
-        """Get MongoDB date filter based on comparison period."""
-        if period == ComparisonPeriod.ALL:
-            return {}
-
-        end_date = datetime.now()
-
-        if period == ComparisonPeriod.TODAY:
-            start_date = end_date
-        elif period == ComparisonPeriod.WEEK:
-            start_date = end_date - timedelta(days=7)
-        elif period == ComparisonPeriod.MONTH:
-            start_date = end_date - timedelta(days=30)
-        elif period == ComparisonPeriod.QUARTER:
-            start_date = end_date - timedelta(days=90)
-        elif period == ComparisonPeriod.YEAR:
-            start_date = end_date - timedelta(days=365)
-        else:
-            return {}
-
-        return {
-            "date": {
-                "$gte": start_date.strftime("%Y-%m-%d"),
-                "$lte": end_date.strftime("%Y-%m-%d")
-            }
-        }
 
 
 # Singleton instance
