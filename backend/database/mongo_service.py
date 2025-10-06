@@ -8,8 +8,8 @@ from pymongo import MongoClient
 from pymongo.errors import PyMongoError
 from datetime import datetime
 
-from src.core.config import get_settings
-from src.models.product import Product
+from backend.core.config import get_settings
+from backend.models.product import Product
 
 logger = logging.getLogger(__name__)
 

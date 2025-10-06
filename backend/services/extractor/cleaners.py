@@ -6,7 +6,7 @@ import re
 import logging
 from typing import Optional
 
-from src.services.extractor.patterns import ExtractionPatterns
+from backend.services.extractor.patterns import ExtractionPatterns
 
 logger = logging.getLogger(__name__)
 

@@ -6,18 +6,18 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import logging
 
-from src.api.routes import (
+from backend.api.routes import (
     process_products,
     health_check,
     get_product_comparison_route,
 )
-from src.api.schemas import (
+from backend.api.schemas import (
     ProcessResponse,
     HealthResponse,
     ProductComparisonSchema,
 )
-from src.core.logging import setup_logging
-from src.core.config import get_settings
+from backend.core.logging import setup_logging
+from backend.core.config import get_settings
 
 # Setup logging
 settings = get_settings()
@@ -84,7 +84,7 @@ async def shutdown_event():
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(
-        "src.api.main:app",
+        "backend.api.main:app",
         host=settings.api_host,
         port=settings.api_port,
         reload=settings.debug

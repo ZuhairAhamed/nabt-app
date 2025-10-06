@@ -1,9 +1,9 @@
 import logging
 from typing import Optional
 
-from src.services.classifier.categories import ProductCategory, get_category_keywords
-from src.llm.config import get_llm, is_llm_available
-from src.llm.prompts import create_classification_prompt
+from backend.services.classifier.categories import ProductCategory, get_category_keywords
+from backend.llm.config import get_llm, is_llm_available
+from backend.llm.prompts import create_classification_prompt
 
 logger = logging.getLogger(__name__)
 

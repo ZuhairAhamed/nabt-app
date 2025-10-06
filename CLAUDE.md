@@ -24,7 +24,7 @@ uv sync
 python -m uvicorn api.main:app --reload
 
 # Or run directly
-python src/api/main.py
+python backend/api/main.py
 
 # Access API docs at http://localhost:8000/docs
 ```
@@ -35,13 +35,13 @@ python src/api/main.py
 pytest
 
 # Format code
-black src/
+black backend/
 
 # Lint code
-ruff check src/
+ruff check backend/
 
 # Type checking
-mypy src/
+mypy backend/
 ```
 
 ## Architecture

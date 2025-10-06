@@ -5,16 +5,16 @@ API routes for product processing and comparison.
 import logging
 from fastapi import HTTPException, Query
 
-from src.api.schemas import (
+from backend.api.schemas import (
     ProcessResponse,
     HealthResponse,
     ProductComparisonSchema,
     SupplierPriceSchema,
     PriceStatisticsSchema,
 )
-from src.services.product_service import process_daily_products
-from src.services.product_comparison_service import get_comparison_service, ComparisonPeriod
-from src.core.config import get_settings
+from backend.services.product_service import process_daily_products
+from backend.services.product_comparison_service import get_comparison_service, ComparisonPeriod
+from backend.core.config import get_settings
 
 logger = logging.getLogger(__name__)
 

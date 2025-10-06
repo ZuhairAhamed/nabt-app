@@ -20,7 +20,7 @@ from enum import Enum
 import statistics
 from collections import defaultdict
 
-from src.database.mongo_service import get_mongo_service
+from backend.database.mongo_service import get_mongo_service
 
 
 class ComparisonPeriod(str, Enum):
