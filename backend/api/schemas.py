@@ -49,9 +49,6 @@ class PriceStatisticsSchema(BaseModel):
     min_price: float
     max_price: float
     avg_price: float
-    median_price: float
-    variance_pct: float
-    std_deviation: float
     supplier_count: int
 
 

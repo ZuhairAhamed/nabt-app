@@ -1,18 +1,6 @@
 """
 Product Comparison Service
-
-This service provides price comparison and competitive analysis functionality
-across multiple suppliers. It enables businesses to:
-- Compare prices for the same products across different suppliers
-- Track price trends over time
-- Identify cost-saving opportunities
-- Get supplier rankings and recommendations
-- Calculate potential savings
-
-The service uses MongoDB aggregation pipelines for efficient data analysis
-and provides both real-time and historical comparison capabilities.
 """
-
 from datetime import datetime, timedelta
 from typing import List, Dict, Optional, Tuple
 from dataclasses import dataclass
@@ -49,9 +37,6 @@ class PriceStatistics:
     min_price: float
     max_price: float
     avg_price: float
-    median_price: float
-    variance_pct: float
-    std_deviation: float
     supplier_count: int
 
 
@@ -97,23 +82,16 @@ class PriceTrend:
 def _calculate_statistics(prices: List[float]) -> PriceStatistics:
     """Calculate statistical measures for a list of prices."""
     if not prices:
-        return PriceStatistics(0, 0, 0, 0, 0, 0, 0)
+        return PriceStatistics(0, 0, 0, 0)
 
     min_price = min(prices)
     max_price = max(prices)
     avg_price = statistics.mean(prices)
-    median_price = statistics.median(prices)
-
-    variance_pct = ((max_price - min_price) / max_price * 100) if max_price > 0 else 0
-    std_dev = statistics.stdev(prices) if len(prices) > 1 else 0
 
     return PriceStatistics(
         min_price=min_price,
         max_price=max_price,
         avg_price=avg_price,
-        median_price=median_price,
-        variance_pct=variance_pct,
-        std_deviation=std_dev,
         supplier_count=len(prices)
     )
 
@@ -149,45 +127,12 @@ def _get_date_filter(period: ComparisonPeriod) -> Dict:
 class ProductComparisonService:
     """
     Service for comparing product prices across multiple suppliers.
-
-    This service provides comprehensive price comparison capabilities including:
-    - Cross-supplier price comparison
-    - Historical price trend analysis
-    - Savings opportunity identification
-    - Supplier performance ranking
-    - Price alert detection
     """
 
     def __init__(self):
         """Initialize the comparison service with MongoDB connection."""
         self.mongo_service = get_mongo_service()
         self.collection = self.mongo_service.collection
-
-    def normalize_product_name(self, product_name: str, unit: str) -> str:
-        """
-        Normalize product name for comparison across suppliers.
-
-        Creates a standardized identifier by combining product name and unit,
-        removing variations in spacing, capitalization, and common prefixes.
-
-        Args:
-            product_name: Original product name
-            unit: Product unit (e.g., "1kg", "500g")
-
-        Returns:
-            Normalized string for matching
-        """
-        # Convert to lowercase and remove extra spaces
-        name = product_name.lower().strip()
-        unit_normalized = unit.lower().strip().replace(" ", "")
-
-        # Remove common prefixes/suffixes
-        prefixes = ["fresh", "organic", "premium", "local", "imported"]
-        for prefix in prefixes:
-            name = name.replace(f"{prefix} ", "")
-
-        # Create normalized key
-        return f"{name}_{unit_normalized}"
 
     def get_product_comparison(
         self,
@@ -279,9 +224,6 @@ _comparison_service_instance = None
 def get_comparison_service() -> ProductComparisonService:
     """
     Get singleton instance of ProductComparisonService.
-
-    Returns:
-        ProductComparisonService: Singleton service instance
     """
     global _comparison_service_instance
     if _comparison_service_instance is None:
