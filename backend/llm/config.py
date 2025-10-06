@@ -13,22 +13,14 @@ logger = logging.getLogger(__name__)
 
 
 class LLMConfig:
-    """Configuration and factory for LLM instances."""
+    # Configuration and factory for LLM instances
     
     DEFAULT_MODEL = "llama-3.1-8b-instant"
     DEFAULT_TEMPERATURE = 0.1
     
     @staticmethod
     def resolve_api_key(api_key: Optional[str] = None) -> Optional[str]:
-        """
-        Resolve API key from parameter or settings.
-        
-        Args:
-            api_key: Optional API key override
-            
-        Returns:
-            Optional[str]: Resolved API key
-        """
+        # Resolve API key from parameter or settings, returns resolved API key or None
         if api_key:
             return api_key
         
@@ -45,17 +37,7 @@ class LLMConfig:
         model_name: str = DEFAULT_MODEL,
         temperature: float = DEFAULT_TEMPERATURE
     ) -> Optional[ChatGroq]:
-        """
-        Create a ChatGroq LLM instance.
-        
-        Args:
-            api_key: Optional API key override
-            model_name: Model name to use
-            temperature: Temperature for generation
-            
-        Returns:
-            Optional[ChatGroq]: LLM instance or None if failed
-        """
+        # Create a ChatGroq LLM instance with specified parameters, returns LLM instance or None if failed
         resolved_key = LLMConfig.resolve_api_key(api_key)
         
         if not resolved_key:
@@ -76,15 +58,7 @@ class LLMConfig:
     
     @staticmethod
     def is_llm_available(api_key: Optional[str] = None) -> bool:
-        """
-        Check if LLM is available.
-        
-        Args:
-            api_key: Optional API key override
-            
-        Returns:
-            bool: True if LLM can be initialized
-        """
+        # Check if LLM is available, returns True if LLM can be initialized
         try:
             from langchain_groq import ChatGroq
             
@@ -101,29 +75,11 @@ def get_llm(
     model_name: str = LLMConfig.DEFAULT_MODEL,
     temperature: float = LLMConfig.DEFAULT_TEMPERATURE
 ) -> Optional[ChatGroq]:
-    """
-    Get an LLM instance.
-    
-    Args:
-        api_key: Optional API key override
-        model_name: Model name to use
-        temperature: Temperature for generation
-        
-    Returns:
-        Optional[ChatGroq]: LLM instance or None if failed
-    """
+    # Get an LLM instance with specified parameters, returns LLM instance or None if failed
     return LLMConfig.create_llm(api_key, model_name, temperature)
 
 
 def is_llm_available(api_key: Optional[str] = None) -> bool:
-    """
-    Check if LLM is available.
-    
-    Args:
-        api_key: Optional API key override
-        
-    Returns:
-        bool: True if LLM can be initialized
-    """
+    # Check if LLM is available, returns True if LLM can be initialized
     return LLMConfig.is_llm_available(api_key)
 

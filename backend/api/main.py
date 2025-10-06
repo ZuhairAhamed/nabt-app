@@ -45,31 +45,31 @@ app.add_middleware(
 
 @app.get("/", response_model=HealthResponse)
 async def root():
-    """Root endpoint - health check."""
+    # Root endpoint - health check
     return await health_check()
 
 
 @app.get("/health", response_model=HealthResponse)
 async def health():
-    """Health check endpoint."""
+    # Health check endpoint
     return await health_check()
 
 
 @app.post("/api/process", response_model=ProcessResponse)
 async def process():
-    """Process products from daily data file."""
+    # Process products from daily data file
     return await process_products()
 
 
 @app.get("/api/comparison/product", response_model=ProductComparisonSchema, tags=["Comparison"])
 async def get_product_comparison(product_name: str, period: str = "today"):
-    """Get price comparison for a specific product across all suppliers. """
+    # Get price comparison for a specific product across all suppliers
     return await get_product_comparison_route(product_name, period)
 
 
 @app.on_event("startup")
 async def startup_event():
-    """Run on application startup."""
+    # Run on application startup
     logger.info("Product Extractor API starting up...")
     logger.info(f"Environment: {settings.app_env}")
     logger.info(f"Debug mode: {settings.debug}")
@@ -77,7 +77,7 @@ async def startup_event():
 
 @app.on_event("shutdown")
 async def shutdown_event():
-    """Run on application shutdown."""
+    # Run on application shutdown
     logger.info("Product Extractor API shutting down...")
 
 

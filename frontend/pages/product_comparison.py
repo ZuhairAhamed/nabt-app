@@ -7,7 +7,7 @@ import pandas as pd
 
 
 def render(api_client):
-    """Render the product comparison page."""
+    # Render the product comparison page
     st.markdown("## 🔍 Product Comparison")
     st.markdown("Compare prices for a specific product across all suppliers.")
 

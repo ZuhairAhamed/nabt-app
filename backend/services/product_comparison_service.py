@@ -12,7 +12,7 @@ from backend.database.mongo_service import get_mongo_service
 
 
 class ComparisonPeriod(str, Enum):
-    """Time period for price comparisons."""
+    # Time period for price comparisons
     TODAY = "today"
     WEEK = "week"
     MONTH = "month"
@@ -23,7 +23,7 @@ class ComparisonPeriod(str, Enum):
 
 @dataclass
 class SupplierPrice:
-    """Represents a supplier's price for a specific product."""
+    # Represents a supplier's price for a specific product
     supplier: str
     price: float
     currency: str
@@ -33,7 +33,7 @@ class SupplierPrice:
 
 @dataclass
 class PriceStatistics:
-    """Statistical analysis of prices across suppliers."""
+    # Statistical analysis of prices across suppliers
     min_price: float
     max_price: float
     avg_price: float
@@ -42,7 +42,7 @@ class PriceStatistics:
 
 @dataclass
 class ProductComparison:
-    """Complete comparison data for a single product."""
+    # Complete comparison data for a single product
     product_name: str
     normalized_name: str
     unit: str
@@ -57,7 +57,7 @@ class ProductComparison:
 
 @dataclass
 class SavingsOpportunity:
-    """Represents a potential cost-saving opportunity."""
+    # Represents a potential cost-saving opportunity
     product_name: str
     current_supplier: str
     current_price: float
@@ -70,7 +70,7 @@ class SavingsOpportunity:
 
 @dataclass
 class PriceTrend:
-    """Price trend data for a product over time."""
+    # Price trend data for a product over time
     product_name: str
     supplier: str
     prices: List[Tuple[str, float]]  # (date, price)
@@ -80,7 +80,7 @@ class PriceTrend:
 
 
 def _calculate_statistics(prices: List[float]) -> PriceStatistics:
-    """Calculate statistical measures for a list of prices."""
+    # Calculate statistical measures for a list of prices
     if not prices:
         return PriceStatistics(0, 0, 0, 0)
 
@@ -97,7 +97,7 @@ def _calculate_statistics(prices: List[float]) -> PriceStatistics:
 
 
 def _get_date_filter(period: ComparisonPeriod) -> Dict:
-    """Get MongoDB date filter based on comparison period."""
+    # Get MongoDB date filter based on comparison period
     if period == ComparisonPeriod.ALL:
         return {}
 
@@ -125,12 +125,10 @@ def _get_date_filter(period: ComparisonPeriod) -> Dict:
 
 
 class ProductComparisonService:
-    """
-    Service for comparing product prices across multiple suppliers.
-    """
+    # Service for comparing product prices across multiple suppliers
 
     def __init__(self):
-        """Initialize the comparison service with MongoDB connection."""
+        # Initialize the comparison service with MongoDB connection
         self.mongo_service = get_mongo_service()
         self.collection = self.mongo_service.collection
 
@@ -139,9 +137,7 @@ class ProductComparisonService:
         product_name: str,
         period: ComparisonPeriod = ComparisonPeriod.TODAY
     ) -> Optional[ProductComparison]:
-        """
-        Get price comparison for a specific product across all suppliers.
-        """
+        # Get price comparison for a specific product across all suppliers
         date_filter = _get_date_filter(period)
 
         # Query all matching products (without unit filter)
@@ -222,9 +218,7 @@ _comparison_service_instance = None
 
 
 def get_comparison_service() -> ProductComparisonService:
-    """
-    Get singleton instance of ProductComparisonService.
-    """
+    # Get singleton instance of ProductComparisonService
     global _comparison_service_instance
     if _comparison_service_instance is None:
         _comparison_service_instance = ProductComparisonService()

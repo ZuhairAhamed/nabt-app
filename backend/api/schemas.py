@@ -7,7 +7,7 @@ from typing import List, Dict, Any, Optional
 
 
 class ProcessResponse(BaseModel):
-    """Response model for processed products."""
+    # Response model for processed products
 
     status: str = Field(..., description="Processing status")
     total_products: int = Field(..., description="Total number of products in input")
@@ -19,13 +19,13 @@ class ProcessResponse(BaseModel):
 
 
 class HealthResponse(BaseModel):
-    """Health check response."""
+    # Health check response
 
     status: str = Field(..., description="Service status")
     version: str = Field(..., description="API version")
 
     class Config:
-        """Pydantic model configuration."""
+        # Pydantic model configuration
         json_schema_extra = {
             "example": {
                 "status": "healthy",
@@ -37,7 +37,7 @@ class HealthResponse(BaseModel):
 # ==================== Comparison API Schemas ====================
 
 class SupplierPriceSchema(BaseModel):
-    """Schema for supplier price information."""
+    # Schema for supplier price information
     supplier: str
     price: float
     currency: str
@@ -45,7 +45,7 @@ class SupplierPriceSchema(BaseModel):
 
 
 class PriceStatisticsSchema(BaseModel):
-    """Schema for price statistics."""
+    # Schema for price statistics
     min_price: float
     max_price: float
     avg_price: float
@@ -53,7 +53,7 @@ class PriceStatisticsSchema(BaseModel):
 
 
 class ProductComparisonSchema(BaseModel):
-    """Schema for product comparison response."""
+    # Schema for product comparison response
     product_name: str
     normalized_name: str
     unit: str

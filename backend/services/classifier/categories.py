@@ -7,7 +7,7 @@ from typing import Dict, List
 
 
 class ProductCategory(Enum):
-    """Product categories."""
+    # Product categories
     FRUITS = "Fruits"
     VEGETABLES = "Vegetables"
     HERBS = "Herbs"
@@ -27,12 +27,7 @@ class ProductCategory(Enum):
 
 
 def get_category_keywords() -> Dict[ProductCategory, List[str]]:
-    """
-    Build keyword mappings for each category.
-    
-    Returns:
-        Dict mapping categories to their keyword lists
-    """
+    # Build keyword mappings for each category, returns dict mapping categories to their keyword lists
     return {
         ProductCategory.FRUITS: [
             # English

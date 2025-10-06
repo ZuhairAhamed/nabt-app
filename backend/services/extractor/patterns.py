@@ -8,7 +8,7 @@ from typing import Set
 
 @dataclass
 class ExtractionPatterns:
-    """Regex patterns and keywords for product data extraction."""
+    # Regex patterns and keywords for product data extraction
     
     COUNTRIES: Set[str] = field(default_factory=lambda: {
         'local', 'philippines', 'egypt', 'saudi', 'saudi arabia', 'china', 
@@ -58,17 +58,17 @@ class ExtractionPatterns:
     })
     
     def get_country_pattern(self) -> str:
-        """Get regex pattern for country extraction."""
+        # Get regex pattern for country extraction
         countries_str = '|'.join(sorted(self.COUNTRIES, key=len, reverse=True))
         return rf'\b({countries_str})\b'
     
     def get_unit_pattern(self) -> str:
-        """Get regex pattern for unit extraction."""
+        # Get regex pattern for unit extraction
         units_str = '|'.join(sorted(self.UNIT_KEYWORDS, key=len, reverse=True))
         return rf'\b(\d+(?:\.\d+)?)\s*({units_str})\b'
     
     def get_descriptive_pattern(self) -> str:
-        """Get regex pattern for descriptive words."""
+        # Get regex pattern for descriptive words
         words_str = '|'.join(sorted(self.DESCRIPTIVE_WORDS, key=len, reverse=True))
         return rf'\b({words_str})\b'
 

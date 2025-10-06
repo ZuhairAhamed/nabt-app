@@ -9,33 +9,24 @@ logger = logging.getLogger(__name__)
 
 
 class ClassificationResult:
-    """Classification result model."""
-    
+    # Classification result model
+
     def __init__(self, category: str, confidence: float, method: str):
-        """
-        Initialize classification result.
-        
-        Args:
-            category: Classified category name
-            confidence: Confidence score (0-1)
-            method: Classification method used
-        """
+        # Initialize classification result with category, confidence score, and method used
         self.category = category
         self.confidence = confidence
         self.method = method
 
 
 class RuleBasedClassifier:
-    """Rule-based product classifier using keyword matching."""
-    
+    # Rule-based product classifier using keyword matching
+
     def __init__(self):
-        """Initialize rule-based classifier."""
+        # Initialize rule-based classifier
         self.category_keywords = get_category_keywords()
     
     def classify_product(self, product_name: str) -> ClassificationResult:
-        """
-        Classify product using keyword matching rules.
-        """
+        # Classify product using keyword matching rules
         product_lower = product_name.lower().strip()
         
         # Calculate scores for each category
@@ -88,12 +79,10 @@ class RuleBasedClassifier:
 
 
 class HybridProductClassifier:
-    """Hybrid classifier: rules first, LLM fallback for low confidence."""
-    
+    # Hybrid classifier: rules first, LLM fallback for low confidence
+
     def __init__(self, groq_api_key: Optional[str] = None):
-        """
-        Initialize the hybrid classifier.
-        """
+        # Initialize the hybrid classifier with optional API key
         self.llm_available = is_llm_available(groq_api_key)
         self.groq_api_key = groq_api_key
         
@@ -111,13 +100,11 @@ class HybridProductClassifier:
         logger.info("Hybrid classifier initialized")
     
     def _setup_llm_prompt(self):
-        """Setup LLM prompt for classification."""
+        # Setup LLM prompt for classification
         self.llm_prompt = create_classification_prompt()
     
     def classify_product(self, product_name: str) -> ClassificationResult:
-        """
-        Classify product using hybrid approach.
-        """
+        # Classify product using hybrid approach
         # Try rule-based classification first
         rule_result = self.rule_classifier.classify_product(product_name)
         
@@ -149,9 +136,7 @@ class HybridProductClassifier:
         )
     
     def _classify_with_llm(self, product_name: str) -> ClassificationResult:
-        """
-        Classify using LLM.
-        """
+        # Classify using LLM
         try:
             response = self.llm.invoke(self.llm_prompt.format_messages(product_name=product_name))
             category_name = response.content.strip()
@@ -177,8 +162,6 @@ class HybridProductClassifier:
 
 
 def get_classifier(groq_api_key: Optional[str] = None) -> HybridProductClassifier:
-    """
-    Get classifier instance.
-    """
+    # Get classifier instance
     return HybridProductClassifier(groq_api_key)
 

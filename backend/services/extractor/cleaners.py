@@ -12,15 +12,10 @@ logger = logging.getLogger(__name__)
 
 
 class ProductNameCleaner:
-    """Cleans product names by removing descriptive words, origin, and units."""
-    
+    # Cleans product names by removing descriptive words, origin, and units
+
     def __init__(self, patterns: ExtractionPatterns):
-        """
-        Initialize cleaner with extraction patterns.
-        
-        Args:
-            patterns: Extraction patterns instance
-        """
+        # Initialize cleaner with extraction patterns
         self.patterns = patterns
         self.descriptive_regex = re.compile(
             patterns.get_descriptive_pattern(), 
@@ -28,9 +23,7 @@ class ProductNameCleaner:
         )
     
     def clean_product_name(self, name: str, origin: Optional[str] = None, unit: Optional[str] = None) -> str:
-        """
-        Clean product name by removing origin, units, and descriptive words.
-        """
+        # Clean product name by removing origin, units, and descriptive words
         clean_name = name
         
         # Remove origin
@@ -64,7 +57,7 @@ class ProductNameCleaner:
         return clean_name
     
     def _extract_core_product_word(self, name: str) -> str:
-        """Extract the core product word when cleaning removes too much."""
+        # Extract the core product word when cleaning removes too much
         words = name.split()
         exclude_words = (
             self.patterns.UNIT_KEYWORDS | 
@@ -83,12 +76,10 @@ class ProductNameCleaner:
 
 
 class OriginExtractor:
-    """Extracts product origin from name."""
-    
+    # Extracts product origin from name
+
     def __init__(self, patterns: ExtractionPatterns):
-        """
-        Initialize extractor with patterns.
-        """
+        # Initialize extractor with patterns
         self.patterns = patterns
         self.country_regex = re.compile(
             patterns.get_country_pattern(), 
@@ -96,9 +87,7 @@ class OriginExtractor:
         )
     
     def extract_origin(self, name: str) -> Optional[str]:
-        """
-        Extract origin from product name.
-        """
+        # Extract origin from product name
         match = self.country_regex.search(name.lower())
         if match:
             origin = match.group(1).title()
@@ -110,12 +99,10 @@ class OriginExtractor:
 
 
 class UnitExtractor:
-    """Extracts product units from name."""
-    
+    # Extracts product units from name
+
     def __init__(self, patterns: ExtractionPatterns):
-        """
-        Initialize extractor with patterns.
-        """
+        # Initialize extractor with patterns
         self.patterns = patterns
         self.unit_regex = re.compile(
             patterns.get_unit_pattern(), 
@@ -129,9 +116,7 @@ class UnitExtractor:
         )
     
     def extract_unit(self, name: str) -> str:
-        """
-        Extract unit from product name.
-        """
+        # Extract unit from product name
         # Check for compound units first
         match = self.compound_units.search(name.lower())
         if match:

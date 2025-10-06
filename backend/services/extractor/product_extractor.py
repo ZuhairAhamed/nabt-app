@@ -19,12 +19,10 @@ logger = logging.getLogger(__name__)
 
 
 class HybridProductExtractor:
-    """Hybrid product extractor: regex for simple cases, LLM for complex ones."""
-    
+    # Hybrid product extractor: regex for simple cases, LLM for complex ones
+
     def __init__(self, groq_api_key: Optional[str] = None):
-        """
-        Initialize the extractor.
-        """
+        # Initialize the extractor with optional API key
         # Initialize patterns and extractors
         self.patterns = ExtractionPatterns()
         self.origin_extractor = OriginExtractor(self.patterns)
@@ -49,9 +47,7 @@ class HybridProductExtractor:
         self.classifier = get_classifier(groq_api_key)
     
     def _is_complex_product_name(self, name: str) -> bool:
-        """
-        Determine if product name is complex enough to require LLM.
-        """
+        # Determine if product name is complex enough to require LLM
         complexity_indicators = [
             len(name.split()) > 5,  # More than 5 words
             any(keyword in name.lower() for keyword in self.patterns.COMPLEXITY_KEYWORDS),
@@ -62,13 +58,11 @@ class HybridProductExtractor:
         return any(complexity_indicators)
     
     def _setup_llm_prompt(self):
-        """Setup LLM prompt template."""
+        # Setup LLM prompt template
         self.llm_prompt = create_extraction_prompt()
     
     def _extract_price(self, price_str: Any) -> float:
-        """
-        Extract and parse price from string.
-        """
+        # Extract and parse price from string, returns float value
         try:
             price_clean = re.sub(r'[^\d.,]', '', str(price_str))
             price_clean = price_clean.replace(',', '.')
@@ -78,9 +72,7 @@ class HybridProductExtractor:
             return 0.0
     
     def _extract_with_regex(self, raw_data: Dict[str, Any]) -> Product:
-        """
-        Extract product data using regex patterns.
-        """
+        # Extract product data using regex patterns
         name = raw_data.get('name', '')
         price = self._extract_price(raw_data.get('price', '0'))
         source = raw_data.get('source', '')
@@ -105,9 +97,7 @@ class HybridProductExtractor:
         )
     
     def _call_llm(self, raw_data: Dict[str, Any]) -> Product:
-        """
-        Call LLM for extraction.
-        """
+        # Call LLM for extraction
         try:
             formatted_prompt = self.llm_prompt.format_messages(
                 name=raw_data.get('name', ''),
@@ -126,9 +116,7 @@ class HybridProductExtractor:
         
     
     def _extract_with_llm(self, raw_data: Dict[str, Any]) -> Product:
-        """
-        Extract product data using LLM with fallback to regex.
-        """
+        # Extract product data using LLM with fallback to regex
         try:
             return self._call_llm(raw_data)
         except Exception as e:
@@ -140,9 +128,7 @@ class HybridProductExtractor:
         
     
     def extract_product_data(self, raw_data: Dict[str, Any]) -> Product:
-        """
-        Extract and classify product data.
-        """
+        # Extract and classify product data
         name = raw_data.get('name', '')
         
         # Choose extraction method
@@ -163,8 +149,6 @@ class HybridProductExtractor:
 
 
 def create_extractor(groq_api_key: Optional[str] = None) -> HybridProductExtractor:
-    """
-    Factory function to create a product extractor instance.
-    """
+    # Factory function to create a product extractor instance
     return HybridProductExtractor(groq_api_key)
 

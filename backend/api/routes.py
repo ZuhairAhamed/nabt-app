@@ -20,9 +20,7 @@ logger = logging.getLogger(__name__)
 
 
 async def process_products() -> ProcessResponse:
-    """
-    Process products from daily data file.
-    """
+    # Process products from daily data file
     try:
         # Get API key from settings
         settings = get_settings()
@@ -62,16 +60,14 @@ async def process_products() -> ProcessResponse:
 
 
 async def health_check() -> HealthResponse:
-    """
-    Health check endpoint.
-    """
+    # Health check endpoint
     return HealthResponse(status="healthy", version="1.0.0")
 
 
 # ==================== Comparison Routes ====================
 
 def _convert_comparison_to_schema(comparison) -> ProductComparisonSchema:
-    """Convert ProductComparison dataclass to Pydantic schema."""
+    # Convert ProductComparison dataclass to Pydantic schema
     return ProductComparisonSchema(
         product_name=comparison.product_name,
         normalized_name=comparison.normalized_name,
@@ -90,9 +86,6 @@ def _convert_comparison_to_schema(comparison) -> ProductComparisonSchema:
             min_price=comparison.statistics.min_price,
             max_price=comparison.statistics.max_price,
             avg_price=comparison.statistics.avg_price,
-            median_price=comparison.statistics.median_price,
-            variance_pct=comparison.statistics.variance_pct,
-            std_deviation=comparison.statistics.std_deviation,
             supplier_count=comparison.statistics.supplier_count
         ),
         best_price_supplier=comparison.best_price_supplier,
@@ -106,12 +99,7 @@ async def get_product_comparison_route(
     product_name: str = Query(..., description="Product name to compare"),
     period: str = Query("today", description="Time period: today, week, month, quarter, year, all")
 ) -> ProductComparisonSchema:
-    """
-    Get price comparison for a specific product across all suppliers.
-
-    Returns detailed comparison including all supplier prices, statistics,
-    and potential savings.
-    """
+    # Get price comparison for a specific product across all suppliers, returns detailed comparison
     try:
         comparison_service = get_comparison_service()
         period_enum = ComparisonPeriod(period.lower())

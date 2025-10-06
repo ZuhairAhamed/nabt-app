@@ -7,7 +7,7 @@ from datetime import datetime
 
 
 def render(api_client):
-    """Render the process products page."""
+    # Render the process products page
     st.markdown("## ⚙️ Process Products")
     st.markdown("Extract and classify products from today's data file using hybrid ML approach.")
 

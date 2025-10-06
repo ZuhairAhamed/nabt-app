@@ -14,10 +14,10 @@ from backend.models.product import Product
 logger = logging.getLogger(__name__)
 
 class MongoDBService:
-    """MongoDB service for managing product data."""
-    
+    # MongoDB service for managing product data
+
     def __init__(self):
-        """Initialize MongoDB connection."""
+        # Initialize MongoDB connection
         settings = get_settings()
         self.client = MongoClient(settings.mongodb_uri)
         self.db = self.client[settings.mongodb_database]
@@ -28,7 +28,7 @@ class MongoDBService:
         logger.info(f"MongoDB service initialized: {settings.mongodb_database}.{settings.mongodb_collection}")
     
     def _create_indexes(self):
-        """Create indexes for optimized queries."""
+        # Create indexes for optimized queries
         try:
             self.collection.create_index([("date", 1), ("name", 1)])
             self.collection.create_index([("date", 1), ("source", 1)])
@@ -37,7 +37,7 @@ class MongoDBService:
             logger.warning(f"Failed to create indexes: {e}")
     
     def insert_products(self, products: List[Product]) -> Dict[str, Any]:
-        """Insert products into MongoDB."""
+        # Insert products into MongoDB
         try:
             today = datetime.now().strftime("%Y-%m-%d")
             
@@ -78,7 +78,7 @@ class MongoDBService:
             raise
     
     def close(self):
-        """Close MongoDB connection."""
+        # Close MongoDB connection
         if self.client:
             self.client.close()
             logger.info("MongoDB connection closed")
@@ -89,7 +89,7 @@ _mongo_service = None
 
 
 def get_mongo_service() -> MongoDBService:
-    """Get or create MongoDB service instance."""
+    # Get or create MongoDB service instance
     global _mongo_service
     if _mongo_service is None:
         _mongo_service = MongoDBService()
@@ -97,7 +97,7 @@ def get_mongo_service() -> MongoDBService:
 
 
 def upload_products(products: List[Product]) -> Dict[str, Any]:
-    """ Upload products to MongoDB."""
+    # Upload products to MongoDB
     service = get_mongo_service()
     return service.insert_products(products)
 

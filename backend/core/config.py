@@ -15,10 +15,10 @@ load_dotenv()
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 
 class Settings:
-    """Application settings loaded from environment variables."""
-    
+    # Application settings loaded from environment variables
+
     def __init__(self):
-        """Initialize settings from environment variables."""
+        # Initialize settings from environment variables
         # API Keys
         self.groq_api_key: Optional[str] = os.getenv("GROQ_API_KEY")
         
@@ -45,7 +45,7 @@ class Settings:
             self.data_directory: str = data_dir
     
     def validate(self) -> None:
-        """Validate required settings."""
+        # Validate required settings
         if not self.groq_api_key:
             raise ValueError(
                 "GROQ_API_KEY environment variable is required. "
@@ -55,8 +55,6 @@ class Settings:
 
 @lru_cache()
 def get_settings() -> Settings:
-    """
-    Get cached settings instance.
-    """
+    # Get cached settings instance
     return Settings()
 

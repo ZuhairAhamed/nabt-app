@@ -7,7 +7,7 @@ from langchain.prompts import ChatPromptTemplate
 
 
 class ProductClassificationPrompts:
-    """Prompt templates for product classification."""
+    # Prompt templates for product classification
     
     CATEGORIES = """Categories:
     - Fruits: Apples, bananas, oranges, berries, etc.
@@ -37,7 +37,7 @@ class ProductClassificationPrompts:
     
     @staticmethod
     def get_system_prompt() -> str:
-        """Get the system prompt for classification."""
+        # Get the system prompt for classification
         return f"""You are a product classification expert. Classify products into these categories:
 
         {ProductClassificationPrompts.CATEGORIES}
@@ -46,7 +46,7 @@ class ProductClassificationPrompts:
             
     @staticmethod
     def get_template() -> ChatPromptTemplate:
-        """Create a prompt template for product classification."""
+        # Create a prompt template for product classification
         return ChatPromptTemplate.from_messages([
             ("system", ProductClassificationPrompts.get_system_prompt()),
             ("human", "Classify this product: {product_name}")
@@ -54,7 +54,7 @@ class ProductClassificationPrompts:
 
 
 class ProductExtractionPrompts:
-    """Prompt templates for product data extraction."""
+    # Prompt templates for product data extraction
     
     EXTRACTION_RULES = """Rules:
     - Original_name: Keep as provided
@@ -78,7 +78,7 @@ class ProductExtractionPrompts:
     
     @staticmethod
     def get_system_prompt(format_instructions: str = "") -> str:
-        """Get the system prompt for data extraction."""
+        # Get the system prompt for data extraction
         prompt = f"""You are a data extraction assistant. Extract product data into JSON format.
 
         {ProductExtractionPrompts.EXTRACTION_RULES}
@@ -92,7 +92,7 @@ class ProductExtractionPrompts:
     
     @staticmethod
     def get_template() -> ChatPromptTemplate:
-        """Create a prompt template for product data extraction."""
+        # Create a prompt template for product data extraction
         return ChatPromptTemplate.from_messages([
             ("system", ProductExtractionPrompts.get_system_prompt("{format_instructions}")),
             ("human", "Extract: Product='{name}', Price='{price}', Source='{source}'")
@@ -101,11 +101,11 @@ class ProductExtractionPrompts:
 
 # Convenience functions for backward compatibility
 def create_classification_prompt() -> ChatPromptTemplate:
-    """Create a classification prompt template."""
+    # Create a classification prompt template
     return ProductClassificationPrompts.get_template()
 
 
 def create_extraction_prompt() -> ChatPromptTemplate:
-    """Create an extraction prompt template."""
+    # Create an extraction prompt template
     return ProductExtractionPrompts.get_template()
 

@@ -7,7 +7,7 @@ from typing import Optional
 
 
 class Product(BaseModel):
-    """Product model with all extracted and classified information."""
+    # Product model with all extracted and classified information
     
     Original_name: str = Field(..., description="Original product name from source")
     ProductName: str = Field(..., description="Cleaned and extracted product name")
