@@ -10,18 +10,11 @@ from src.api.routes import (
     process_products,
     health_check,
     get_product_comparison_route,
-    get_all_comparisons_route,
-    get_price_trends_route,
-    get_category_best_suppliers_route
 )
 from src.api.schemas import (
     ProcessResponse,
     HealthResponse,
     ProductComparisonSchema,
-    AllComparisonsResponse,
-    PriceTrendsResponse,
-    BasketSavingsRequest,
-    CategoryBestSuppliersResponse
 )
 from src.core.logging import setup_logging
 from src.core.config import get_settings
@@ -64,53 +57,14 @@ async def health():
 
 @app.post("/api/process", response_model=ProcessResponse)
 async def process():
+    """Process products from daily data file."""
     return await process_products()
 
 
-# ==================== Comparison Endpoints ====================
-
 @app.get("/api/comparison/product", response_model=ProductComparisonSchema, tags=["Comparison"])
-async def get_product_comparison(
-    product_name: str,
-    unit: str,
-    period: str = "today"
-):
-    """
-    Get price comparison for a specific product across all suppliers.
-    """
-    return await get_product_comparison_route(product_name, unit, period)
-
-
-@app.get("/api/comparison/all", response_model=AllComparisonsResponse, tags=["Comparison"])
-async def get_all_comparisons(
-    category: str = None,
-    min_suppliers: int = 2,
-    period: str = "today"
-):
-    """
-    Get price comparisons for all products with multiple suppliers.
-    """
-    return await get_all_comparisons_route(category, min_suppliers, period)
-
-
-@app.get("/api/comparison/trends", response_model=PriceTrendsResponse, tags=["Comparison"])
-async def get_price_trends(
-    product_name: str,
-    unit: str,
-    supplier: str = None,
-    days: int = 30
-):
-    """
-    Get historical price trends for a product.
-    """
-    return await get_price_trends_route(product_name, unit, supplier, days)
-
-@app.get("/api/comparison/categories/best", response_model=CategoryBestSuppliersResponse, tags=["Comparison"])
-async def get_category_best_suppliers(period: str = "month"):
-    """
-    Get the best supplier for each product category.
-    """
-    return await get_category_best_suppliers_route(period)
+async def get_product_comparison(product_name: str, period: str = "today"):
+    """Get price comparison for a specific product across all suppliers. """
+    return await get_product_comparison_route(product_name, period)
 
 
 @app.on_event("startup")

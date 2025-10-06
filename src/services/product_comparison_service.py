@@ -40,7 +40,6 @@ class SupplierPrice:
     price: float
     currency: str
     date: str
-    in_stock: bool = True
     last_updated: Optional[datetime] = None
 
 
@@ -122,7 +121,7 @@ class ProductComparisonService:
     def __init__(self):
         """Initialize the comparison service with MongoDB connection."""
         self.mongo_service = get_mongo_service()
-        self.collection = self.mongo_service.get_collection()
+        self.collection = self.mongo_service.collection
 
     def normalize_product_name(self, product_name: str, unit: str) -> str:
         """
@@ -153,7 +152,6 @@ class ProductComparisonService:
     def get_product_comparison(
         self,
         product_name: str,
-        unit: str,
         period: ComparisonPeriod = ComparisonPeriod.TODAY
     ) -> Optional[ProductComparison]:
         """
@@ -161,20 +159,17 @@ class ProductComparisonService:
 
         Args:
             product_name: Name of the product to compare
-            unit: Product unit measurement
             period: Time period for comparison
 
         Returns:
             ProductComparison object with all supplier prices and statistics,
             or None if product not found
         """
-        normalized_name = self.normalize_product_name(product_name, unit)
         date_filter = self._get_date_filter(period)
 
-        # Query all matching products
+        # Query all matching products (without unit filter)
         query = {
             "name": {"$regex": product_name, "$options": "i"},
-            "unit": unit,
             **date_filter
         }
 
@@ -204,7 +199,6 @@ class ProductComparisonService:
                 price=price,
                 currency=product.get("currency", "SAR"),
                 date=product.get("date", ""),
-                in_stock=True,
                 last_updated=datetime.now()
             )
             supplier_prices.append(sp)
@@ -227,6 +221,10 @@ class ProductComparisonService:
         else:
             savings_pct = 0.0
             savings_amount = 0.0
+
+        # Get the most common unit from the products
+        unit = products[0].get("unit", "")
+        normalized_name = product_name.lower().strip()
 
         return ProductComparison(
             product_name=product_name,
