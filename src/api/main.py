@@ -33,7 +33,7 @@ logger = logging.getLogger(__name__)
 
 # Create FastAPI app
 app = FastAPI(
-    title="Nabt Product Extractor API",
+    title="Product Extractor API",
     description="API for extracting and classifying product data using hybrid ML approach",
     version="1.0.0",
     docs_url="/docs",
@@ -116,7 +116,7 @@ async def get_category_best_suppliers(period: str = "month"):
 @app.on_event("startup")
 async def startup_event():
     """Run on application startup."""
-    logger.info("Nabt Product Extractor API starting up...")
+    logger.info("Product Extractor API starting up...")
     logger.info(f"Environment: {settings.app_env}")
     logger.info(f"Debug mode: {settings.debug}")
 
@@ -124,7 +124,7 @@ async def startup_event():
 @app.on_event("shutdown")
 async def shutdown_event():
     """Run on application shutdown."""
-    logger.info("Nabt Product Extractor API shutting down...")
+    logger.info("Product Extractor API shutting down...")
 
 
 if __name__ == "__main__":
