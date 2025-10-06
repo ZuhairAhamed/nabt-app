@@ -7,7 +7,7 @@ import logging
 from typing import Optional
 from langchain_groq import ChatGroq
 
-from core.config import get_settings
+from src.core.config import get_settings
 
 logger = logging.getLogger(__name__)
 

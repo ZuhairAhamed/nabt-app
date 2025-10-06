@@ -8,11 +8,10 @@ from pymongo import MongoClient
 from pymongo.errors import PyMongoError
 from datetime import datetime
 
-from core.config import get_settings
-from models.product import Product
+from src.core.config import get_settings
+from src.models.product import Product
 
 logger = logging.getLogger(__name__)
-
 
 class MongoDBService:
     """MongoDB service for managing product data."""
@@ -38,18 +37,7 @@ class MongoDBService:
             logger.warning(f"Failed to create indexes: {e}")
     
     def insert_products(self, products: List[Product]) -> Dict[str, Any]:
-        """
-        Insert products into MongoDB.
-        
-        Args:
-            products: List of Product objects to insert
-            
-        Returns:
-            Dict containing status and count
-            
-        Raises:
-            PyMongoError: If database operation fails
-        """
+        """Insert products into MongoDB."""
         try:
             today = datetime.now().strftime("%Y-%m-%d")
             
@@ -101,12 +89,7 @@ _mongo_service = None
 
 
 def get_mongo_service() -> MongoDBService:
-    """
-    Get or create MongoDB service instance.
-    
-    Returns:
-        MongoDBService: MongoDB service instance
-    """
+    """Get or create MongoDB service instance."""
     global _mongo_service
     if _mongo_service is None:
         _mongo_service = MongoDBService()
@@ -114,15 +97,7 @@ def get_mongo_service() -> MongoDBService:
 
 
 def upload_products(products: List[Product]) -> Dict[str, Any]:
-    """
-    Upload products to MongoDB.
-    
-    Args:
-        products: List of Product objects to upload
-        
-    Returns:
-        Dict containing status and count
-    """
+    """ Upload products to MongoDB."""
     service = get_mongo_service()
     return service.insert_products(products)
 

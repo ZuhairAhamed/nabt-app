@@ -8,12 +8,12 @@ from typing import Dict, Any, Optional
 from pydantic import BaseModel
 from langchain.output_parsers import PydanticOutputParser
 
-from models.product import Product
-from services.extractor.patterns import ExtractionPatterns
-from services.extractor.cleaners import ProductNameCleaner, OriginExtractor, UnitExtractor
-from services.classifier.product_classifier import get_classifier
-from llm.config import get_llm, is_llm_available
-from llm.prompts import create_extraction_prompt
+from src.models.product import Product
+from src.services.extractor.patterns import ExtractionPatterns
+from src.services.extractor.cleaners import ProductNameCleaner, OriginExtractor, UnitExtractor
+from src.services.classifier.product_classifier import get_classifier
+from src.llm.config import get_llm, is_llm_available
+from src.llm.prompts import create_extraction_prompt
 
 logger = logging.getLogger(__name__)
 

@@ -6,10 +6,25 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import logging
 
-from api.routes import process_products, health_check
-from api.schemas import ProcessResponse, HealthResponse
-from core.logging import setup_logging
-from core.config import get_settings
+from src.api.routes import (
+    process_products,
+    health_check,
+    get_product_comparison_route,
+    get_all_comparisons_route,
+    get_price_trends_route,
+    get_category_best_suppliers_route
+)
+from src.api.schemas import (
+    ProcessResponse,
+    HealthResponse,
+    ProductComparisonSchema,
+    AllComparisonsResponse,
+    PriceTrendsResponse,
+    BasketSavingsRequest,
+    CategoryBestSuppliersResponse
+)
+from src.core.logging import setup_logging
+from src.core.config import get_settings
 
 # Setup logging
 settings = get_settings()
@@ -47,14 +62,55 @@ async def health():
     return await health_check()
 
 
-@app.post("/process", response_model=ProcessResponse)
+@app.post("/api/process", response_model=ProcessResponse)
 async def process():
-    """
-    Process products from daily data file.
-    
-    This endpoint processes product data through the extraction and classification pipeline.
-    """
     return await process_products()
+
+
+# ==================== Comparison Endpoints ====================
+
+@app.get("/api/comparison/product", response_model=ProductComparisonSchema, tags=["Comparison"])
+async def get_product_comparison(
+    product_name: str,
+    unit: str,
+    period: str = "today"
+):
+    """
+    Get price comparison for a specific product across all suppliers.
+    """
+    return await get_product_comparison_route(product_name, unit, period)
+
+
+@app.get("/api/comparison/all", response_model=AllComparisonsResponse, tags=["Comparison"])
+async def get_all_comparisons(
+    category: str = None,
+    min_suppliers: int = 2,
+    period: str = "today"
+):
+    """
+    Get price comparisons for all products with multiple suppliers.
+    """
+    return await get_all_comparisons_route(category, min_suppliers, period)
+
+
+@app.get("/api/comparison/trends", response_model=PriceTrendsResponse, tags=["Comparison"])
+async def get_price_trends(
+    product_name: str,
+    unit: str,
+    supplier: str = None,
+    days: int = 30
+):
+    """
+    Get historical price trends for a product.
+    """
+    return await get_price_trends_route(product_name, unit, supplier, days)
+
+@app.get("/api/comparison/categories/best", response_model=CategoryBestSuppliersResponse, tags=["Comparison"])
+async def get_category_best_suppliers(period: str = "month"):
+    """
+    Get the best supplier for each product category.
+    """
+    return await get_category_best_suppliers_route(period)
 
 
 @app.on_event("startup")
@@ -74,7 +130,7 @@ async def shutdown_event():
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(
-        "api.main:app",
+        "src.api.main:app",
         host=settings.api_host,
         port=settings.api_port,
         reload=settings.debug

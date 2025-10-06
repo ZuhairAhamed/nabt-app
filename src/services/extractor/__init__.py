@@ -1,2 +1,0 @@
-"""Product extraction services."""
-

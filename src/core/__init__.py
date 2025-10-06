@@ -1,2 +1,0 @@
-"""Core functionality and configuration."""
-

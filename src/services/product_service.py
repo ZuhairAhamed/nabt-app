@@ -4,9 +4,9 @@ from datetime import datetime
 from typing import List, Dict, Any, Tuple
 import logging
 
-from services.extractor.product_extractor import create_extractor
-from database.mongo_service import upload_products
-from models.product import Product
+from src.services.extractor.product_extractor import create_extractor
+from src.database.mongo_service import upload_products
+from src.models.product import Product
 
 logger = logging.getLogger(__name__)
 
